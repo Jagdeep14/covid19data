@@ -1,4 +1,4 @@
-Package: covid19
+Package: covid19data
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
@@ -6,6 +6,13 @@ Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: TRUE
+RoxygenNote: 7.1.2
+Depends: R (>= 3.4.0)
+Imports: httr (>= 1.4.2),
+         lubridate (>= 1.7.10), 
+         jsonlite (>= 1.7.2), 
+         dplyr (>= 1.0.7)
+Suggests: 
