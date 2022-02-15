@@ -9,6 +9,36 @@ request_fun <- function(){
   return(request)
 }
 #'
+#' @keywords internal
+  request_fun_date_summary <- function(date){
+  base_url <- 'https://api.opencovid.ca/summary?date='
+  url <- gsub(" ", "", paste(base_url, date))
+  request <- GET(url)
+  return(request)
+}
+#'
+#' @keywords internal
+  request_fun_summary_canada <- function(date){
+    base_url <- 'https://api.opencovid.ca/summary?loc=canada&date='
+    url <- gsub(" ", "", paste(base_url, date))
+    request <- GET(url)
+    return(request)
+  }
+#'
+#' @keywords internal
+  request_fun_summary <- function() {
+    url <- "https://api.opencovid.ca/summary"
+    request <- GET(url)
+    return(request)
+  }
+#'
+#' @keywords internal
+  request_fun_pop <- function(){
+    url <- 'https://api.opencovid.ca/other?stat=prov'
+    request <- GET(url)
+    return(request)
+  }
+#'
 #' @export
 active_cases <- function(provinceName = 'Canada'){
   #' @title  Returns a dataframe of active Covid-19 cases in desired province of Canada
@@ -181,6 +211,11 @@ Yearlycases_as_per_province <- function(provinceName = 'Canada',yearpassed='2020
     stop("Please enter a valid province name that too in its full form!")
   }
 
+  year_check <- gsub(" ", "", paste(yearpassed, "-01-01"))
+  if(is.na(ymd(year_check))){
+    stop("Please enter a valid year as string in format yyyy !!")
+  }
+
   request <- request_fun()
 
   json_data <- content(request, as  = "parse")
@@ -201,6 +236,9 @@ Yearlycases_as_per_province <- function(provinceName = 'Canada',yearpassed='2020
 
   cases_data <- cases_data[, c(3, 4, 1, 2, 5)]
 
+  if(yearpassed %!in% unique(cases_data$year)){
+    stop("There is no data for this year!")
+  }
 
   if(tolower(provinceName) == 'canada'){
     cases_data <- cases_data %>%
@@ -333,6 +371,11 @@ yearly_vaccine_distribution<- function(provinceName = 'Canada',distyear='2020'){
     stop("Please enter a valid province name that too in its full form!")
   }
 
+  year_check <- gsub(" ", "", paste(distyear, "-01-01"))
+  if(is.na(ymd(year_check))){
+    stop("Please enter a valid year as string in format yyyy !!")
+  }
+
   request <- request_fun()
 
   json_data <- content(request, as  = "parse")
@@ -352,6 +395,10 @@ yearly_vaccine_distribution<- function(provinceName = 'Canada',distyear='2020'){
     mutate(year = format(distribution_date, format = "%Y"))
 
   dvaccine_data <- dvaccine_data[, c(2, 4, 1, 3, 5)]
+
+  if(distyear %!in% unique(dvaccine_data$year)){
+    stop("There is no data for this year!")
+  }
 
   if(tolower(provinceName) == 'canada'){
     dvaccine_data <- dvaccine_data %>%
@@ -434,6 +481,10 @@ yearly_deaths<- function(provinceName = 'Canada', dyear='2020'){
   if(tolower(provinceName) %!in% tolower(prov)){
     stop("Please enter a valid province name that too in its full form!")
   }
+  year_check <- gsub(" ", "", paste(dyear, "-01-01"))
+  if(is.na(ymd(year_check))){
+    stop("Please enter a valid year as string in format yyyy !!")
+  }
 
   request <- request_fun()
 
@@ -454,6 +505,10 @@ yearly_deaths<- function(provinceName = 'Canada', dyear='2020'){
     mutate(year = format(death_date, format = "%Y"))
 
   mortaility_data <- mortaility_data[, c(2, 4, 1, 3, 5)]
+
+  if(dyear %!in% unique(mortaility_data$year)){
+    stop("There is no data for this year!")
+  }
 
   if(tolower(provinceName) == 'canada'){
     mortaility_data <- mortaility_data %>%
@@ -536,6 +591,10 @@ yearly_recovered<- function(provinceName = 'Canada', ryear='2020'){
   if(tolower(provinceName) %!in% tolower(prov)){
     stop("Please enter a valid province name that too in its full form!")
   }
+  year_check <- gsub(" ", "", paste(ryear, "-01-01"))
+  if(is.na(ymd(year_check))){
+    stop("Please enter a valid year as string in format yyyy !!")
+  }
 
   request <- request_fun()
 
@@ -556,6 +615,9 @@ yearly_recovered<- function(provinceName = 'Canada', ryear='2020'){
     mutate(year = format(date_recovered, format = "%Y"))
 
   recovered_data <- recovered_data[, c(2, 3, 1, 4,5)]
+  if(ryear %!in% unique(recovered_data$year)){
+    stop("There is no data for this year!")
+  }
 
   if(tolower(provinceName) == 'canada'){
     recovered_data <- recovered_data %>%
@@ -614,4 +676,210 @@ testing <- function(provinceName = 'Canada'){
       filter(tolower(province) == tolower(provinceName))
     return(testing_data)
   }
+}
+#'
+#' @export
+summary_of_cases <- function(provinceName = "Canada") {
+  #' @title Covid-19 particular day\'s individual summary for every Canadian province
+  #'
+  #' @description Summary for all the provinces relating to Covid-19 active cases, avaccine, cvaccine and dvaccine. Moreover, is discloses   #' the count of people who have recovered and who were tested.
+  #' It processes the API and returns the json data corresponding to entered province. exceptional user input have been handled. If
+  #' Canada is passed as an argument the output displays the data for all the Canadian provinces.The returned data is a data frame and,
+  #'
+  #' @param provinceName a character/ string depicting the name of the province
+  #'
+  #' @return Data frame with all the columns for the entire summary for all the provinces individually would be returned. The columns       #' includes the date, province name, active_cases, active_cases_change, avaccine, cases,cumulative_avaccine,
+  #' cumulative_cases,cumulative_cvaccine, cumulative_deaths,   cumulative_dvaccine, cumulative_recovered, cumulative_testing, cvaccine,
+  #' deaths, dvaccine, recovered, testing and testing_info.
+  #'
+  #' @examples summary_of_cases("Ontario")
+
+  prov <- c("Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Nova Scotia", "Nunavut", "Northwest Territories", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Yukon", "Canada")
+
+  `%!in%` <- Negate(`%in%`)
+  if (tolower(provinceName) %!in% tolower(prov)) {
+    stop("Please enter a valid province name in full form!")
+  }
+
+  request <- request_fun_summary()
+  json_data <- content(request, as = "parse")
+  active_data <- data.frame()
+
+  for (i in 1:length(json_data[[1]])) {
+    active_data <- rbind(active_data, data.frame(json_data[[1]][[i]]))
+  }
+
+  active_data <- active_data %>%
+    mutate(date, date = dmy(date)) %>%
+    mutate(
+      province = replace(province, province %in% c("BC"), "British Columbia"),
+      province = replace(province, province %in% c("NL"), "Newfoundland and Labrador"),
+      province = replace(province, province %in% c("NWT"), "Northwest Territories"),
+      province = replace(province, province %in% c("PEI"), "Prince Edward Island")
+    )
+
+
+  active_data <- active_data[, c(13, 16, 1:12, 14:15, 17:19)]
+  if (tolower(provinceName) == "canada") {
+    return(active_data)
+  } else {
+    active_data <- active_data %>%
+      filter(tolower(province) == tolower(provinceName))
+    return(active_data)
+  }
+}
+#'
+#' @export
+summary_of_peaktime <- function(provinceName = "Canada", date = '01-09-2020') {
+  #' @title Covid-19 peak time which is September 2020 individual summary for every Canadian province
+  #'
+  #' @description Summary for all the provinces relating to Covid-19 peak time in Canada which is the month of September 2020 or on
+  #' desired date: the
+  #' active cases, avaccine, cvaccine and dvaccine. Moreover, is discloses the count of people who have recovered and who were tested on
+  #' September 01, 2020.
+  #' It processes the API and returns the json data corresponding to entered province. If
+  #' 'Canada' is passed as an argument the output displays the data for all the Canadian provinces.The returned data is a data frame and,
+  #'
+  #' @param provinceName a character/ string depicting the name of the province
+  #' @param date desired date - to get the summary up to this date
+  #'
+  #' @return Data frame with all the columns for the entire summary for all the provinces individually would be returned. The columns
+  #' includes the date, province name, active_cases, active_cases_change, avaccine, cases,cumulative_avaccine,
+  #' cumulative_cases,cumulative_cvaccine, cumulative_deaths,   cumulative_dvaccine, cumulative_recovered, cumulative_testing, cvaccine,
+  #' deaths, dvaccine, recovered, testing and testing_info.
+  #'
+  #' @examples summary_of_peaktime("Ontario")
+
+  prov = c("Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Nova Scotia", "Nunavut", "Northwest Territories", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Yukon", "Canada")
+
+  `%!in%` <- Negate(`%in%`)
+  if (tolower(provinceName) %!in% tolower(prov)) {
+    stop("Please enter a valid province name in full form!")
+  }
+
+  if(is.na(dmy(date))){
+    stop("Please enter a valid date as string in format dd-mm-yyyy !!")
+  }
+  request <- request_fun_date_summary(date)
+  json_data <- content(request, as = "parse")
+  active_data <- data.frame()
+
+  for(i in 1:length(json_data[[1]])){
+
+    active_data <- rbind(active_data, data.frame(json_data[[1]][[i]]))
+  }
+
+  active_data <- active_data %>%
+    mutate(date, date = dmy(date)) %>%
+    mutate(province = replace(province, province %in% c("BC"), "British Columbia"),
+           province = replace(province, province %in% c("NL"), "Newfoundland and Labrador"),
+           province = replace(province, province %in% c("NWT"), "Northwest Territories"),
+           province = replace(province, province %in% c("PEI"), "Prince Edward Island"))
+
+
+  active_data <- active_data[,c(13,16,1:12,14:15,17:19)]
+
+  if(tolower(provinceName) == "canada"){
+    return(active_data)
+  } else {
+    active_data <- active_data %>%
+      filter(tolower(province) == tolower(provinceName))
+    return(active_data)
+  }
+
+}
+#'
+#' @export
+summary_of_canada <- function(date = '01-09-2020'){
+  #' @title Covid-19 cases summary on 01 September 2020 or on desired date for entire Canada
+  #'
+  #' @description Summary for the entire country relating to Covid-19 peak time in Canada which is the month of September 2020 : the
+  #' active cases, avaccine, cvaccine and dvaccine. Moreover, is discloses the count of people who have recovered and who were tested on
+  #' September 01, 2020.
+  #' It processes the API and returns the json data corresponding to the summary from all the data for all the Canadian provinces.The
+  #' returned data is a data frame and,
+  #'
+  #' @param date desired date - to get the summary up to this date
+  #'
+  #'
+  #' @return Data frame with all the columns for the entire summary for all the provinces individually would be returned. The columns
+  #' includes the date, province name, active_cases, active_cases_change, avaccine, cases,cumulative_avaccine,
+  #' cumulative_cases,cumulative_cvaccine, cumulative_deaths,   cumulative_dvaccine, cumulative_recovered, cumulative_testing, cvaccine,
+  #' deaths, dvaccine, recovered, testing and testing_info.
+  #'
+  #' @examples summary_of_canada()
+
+  if(is.na(dmy(date))){
+    stop("Please enter a valid date as string in format dd-mm-yyyy !!")
+  }
+
+  request <- request_fun_summary_canada(date)
+  json_data <- content(request, as  = "parse")
+  all_active <- json_data$active
+  active_data <- data.frame()
+
+  for(i in 1:length(json_data[[1]])){
+    active_data <- rbind(active_data, data.frame(json_data[[1]][[i]]))
+  }
+
+  active_data <- active_data %>%
+    mutate(date, date = dmy(date))
+
+  active_data <- active_data[,c(13,16,1:12,14:15,17:19)]
+  return(active_data)
+}
+#'
+#' @export
+province_population <- function(provinceName = 'Canada'){
+  #' @title Total population segregated for every Canadian province.
+  #'
+  #' @description The total population count for every province is individual mentioned.
+  #' It processes the API and returns the json data corresponding to entered province.
+  #' If 'Canada' is passed as an argument the output displays the data for all the Canadian
+  #' provinces.The returned data is a data frame and,
+  #'
+  #' @param provinceName a character/ string depicting the name of the province
+  #'
+  #' @return Data frame with all the columns for the entire summary for all the provinces individually would be
+  #' returned. The columns includes the date, province name, active_cases, active_cases_change, avaccine,
+  #' cases,cumulative_avaccine, cumulative_cases,cumulative_cvaccine, cumulative_deaths,   cumulative_dvaccine,
+  #' cumulative_recovered, cumulative_testing, cvaccine, deaths, dvaccine, recovered, testing and testing_info.
+  #'
+  #' @examples province_population("Ontario")
+
+  prov = c("Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Nova Scotia", "Nunavut", "Northwest Territories", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Yukon", "Canada")
+
+  `%!in%` <- Negate(`%in%`)
+  if(tolower(provinceName) %!in% tolower(prov)){
+    stop("Please enter a valid province name in full form!")
+  }
+
+  request <- request_fun_pop()
+  json_data <- content(request, as  = "parse")
+  all_active <- json_data$active
+  active_data <- data.frame()
+
+
+  for(i in 1:length(json_data[[1]])){
+
+    active_data <- rbind(active_data, data.frame(json_data[[1]][[i]]))
+  }
+
+
+  active_data <- active_data %>%
+    mutate(province = replace(province, province %in% c("BC"), "British Columbia"),
+           province = replace(province, province %in% c("NL"), "Newfoundland and Labrador"),
+           province = replace(province, province %in% c("NWT"), "Northwest Territories"),
+           province = replace(province, province %in% c("PEI"), "Prince Edward Island"))
+
+
+  active_data <- active_data[,c(2,1)]
+  if(tolower(provinceName) == "canada"){
+    return(active_data)
+  } else {
+    active_data <- active_data %>%
+      filter(tolower(province) == tolower(provinceName))
+    return(active_data)
+  }
+
 }
