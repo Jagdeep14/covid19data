@@ -1,6 +1,6 @@
 ---
 title: "COVID19data Vignette"
-output: pdf_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{COVID19data Vignette}
   %\VignetteEngine{knitr::rmarkdown}
