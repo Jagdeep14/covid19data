@@ -1,4 +1,4 @@
 library(testthat)
-library(COVID19data)
+library(covid19data)
 
 test_check("COVID19data")

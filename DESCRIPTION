@@ -1,4 +1,4 @@
-Package: COVID19data
+Package: covid19data
 Type: Package
 Title: COVID19 data of Canada 
 Version: 0.1.0

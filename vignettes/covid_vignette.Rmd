@@ -1,6 +1,6 @@
 ---
 title: "COVID19data Vignette"
-output: rmarkdown::html_vignette
+output: pdf_document
 vignette: >
   %\VignetteIndexEntry{COVID19data Vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -46,7 +46,7 @@ The detailed description of these functions as given below.
 First, user need to install `install.packages("devtools")` and then install the package from github using command `install_github('aishwaryasharma10/COVID19data', build_vignettes=TRUE)`. Make the optional argument `build_vignettes` true if you want to build vignettes for this package and use `browseVignettes("COVID19data")` to see the vignette . Then, the package can be loaded as below:
 
 ```{r setup}
-library(COVID19data)
+library(covid19data)
 ```
 
 ### 1. active_cases(provinceName = 'Canada')
