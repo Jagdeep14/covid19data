@@ -1,4 +1,6 @@
 version: 3.4
+orbs:
+    hello: circleci/hello-build@0.0.5
 jobs:
   build:
     docker:
