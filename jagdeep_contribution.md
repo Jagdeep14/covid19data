@@ -1,8 +1,10 @@
 ## Jagdeep contributions file
 
-We collectively decide two persons will mainly work on the functions and test cases, and third one will figure out how to craete package in R and other stuff related to package.
+We have collectively decided two persons will mainly work on the functions and test cases, and third one will figure out how to craete package in R and other stuff related to package.
 Aishwarya and Harpreet's focus was on functions and test cases and Jagdeep's focus was to create a test R package with one function and make it working. I have provided below the link of repository 
-where I a have craeted the test package and then we craeted package in our final repository.
+where I a have created the test package and then we created the package in our final repository [https://github.com/aishwaryasharma10/COVID19data.git](https://github.com/aishwaryasharma10/COVID19data.git).
+
+Jagdeep's Contribution:
 
 ### day 1
 1. Searched for API to start work with and selected [https://opencovid.ca/api/#welcome](https://opencovid.ca/api/#welcome) API.
